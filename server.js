@@ -37,7 +37,7 @@ app.get("/error", (req, res) => {
   throw new Error("Test Error");
 });
 
-// ERROR HANDLER (ALWAYS LAST)
+// ERROR HANDLER
 app.use(errorHandler);
 
 // DB connect
