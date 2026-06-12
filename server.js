@@ -1,8 +1,22 @@
+import express from "express";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 
-// middleware
+import { errorHandler } from "./middleware/errorMiddleware.js";
+
+// config
+dotenv.config();
+
+const app = express();
+
+// body parser
+app.use(express.json());
+
+// security middleware
 app.use(helmet());
 app.use(cors());
 
@@ -11,4 +25,31 @@ const limiter = rateLimit({
   max: 100,
 });
 
-app.use(limiter); // rate limiting added
+app.use(limiter);
+
+// test route
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
+// test error route
+app.get("/error", (req, res) => {
+  throw new Error("Test Error");
+});
+
+// ERROR HANDLER (ALWAYS LAST)
+app.use(errorHandler);
+
+// DB connect
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Connected");
+
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(`Server running on port ${process.env.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
