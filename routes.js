@@ -15,3 +15,10 @@ router.post(
     loginUser
 );
 module.exports = router;
+const { protect } = require("./authMiddleware");
+const {
+    registerUser,
+    loginUser,
+    getProfile
+} = require("./controllers");
+router.get("/profile", protect, getProfile);

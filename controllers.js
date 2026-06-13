@@ -72,3 +72,20 @@ exports.loginUser = async(req,res)=>{
         });
     }
 };
+exports.getProfile = async (req, res) => {
+    try {
+
+        res.status(200).json({
+            id: req.user._id,
+            username: req.user.username,
+            email: req.user.email
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+};
