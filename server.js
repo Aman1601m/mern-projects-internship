@@ -2,9 +2,11 @@ require("dotenv").config();
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes');
+const errorHandler = require('./errorMiddleware');
 const app = express();
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+app.use(errorHandler);
 const MONGO_URI = process.env.MONGO_URI;
 mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDB Connected Successfully!'))
