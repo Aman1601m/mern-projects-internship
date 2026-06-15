@@ -1,30 +1,48 @@
 const jwt = require("jsonwebtoken");
 const User = require("./user");
-const protect = async (req,res,next)=>{
+const protect = async (req, res, next) => {
     let token;
-    if(
+    if (
         req.headers.authorization &&
         req.headers.authorization.startsWith("Bearer")
-    ){
-        try{
+    ) {
+        try {
             token = req.headers.authorization.split(" ")[1];
             const decoded = jwt.verify(
                 token,
                 process.env.JWT_SECRET || "secretkey"
             );
             req.user = await User.findById(decoded.id)
-            .select("-password");
+                .select("-password");
             next();
-        }catch(error){
-            res.status(401).json({
-                message:"Not authorized, token failed"
+        } catch (error) {
+            return res.status(401).json({
+                message: "Not authorized, token failed"
             });
         }
     }
-    if(!token){
-        res.status(401).json({
-            message:"No token found"
+    if (!token) {
+        return res.status(401).json({
+            message: "No token found"
         });
     }
 };
-module.exports = {protect};
+const authorizeRoles = (...allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({
+                message: "User not authenticated"
+            });
+        }
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({
+                message: `Role (${req.user.role}) is not allowed to access this resource`
+            });
+        }
+        next();
+    };
+};
+module.exports = {
+    protect,
+    authorizeRoles
+};
