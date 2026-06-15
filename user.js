@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
+
   email: {
     type: String,
     required: [true, 'santhosh0616r@gmail.com'],
@@ -17,16 +18,24 @@ const UserSchema = new mongoose.Schema({
       'santhosh0616r@gmail.com'
     ]
   },
+
   password: {
     type: String,
     required: [true, 'Santhosh0616'],
     minlength: 6,
     select: false
+  },
+
+  role: {
+    type: String,
+    enum: ["Employee", "HR Manager", "Admin"],
+    default: "Employee"
   }
-}, 
+},
 {
   timestamps: true
 });
+
 UserSchema.pre('save', async function(next){
   if(!this.isModified('password')){
     return next();
@@ -38,10 +47,12 @@ UserSchema.pre('save', async function(next){
   );
   next();
 });
+
 UserSchema.methods.matchPassword = async function(enteredPassword){
   return await bcrypt.compare(
     enteredPassword,
     this.password
   );
 };
+
 module.exports = mongoose.model('User', UserSchema);
