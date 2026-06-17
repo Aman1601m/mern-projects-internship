@@ -89,3 +89,30 @@ exports.getProfile = async (req, res) => {
 
     }
 };
+
+const Leave = require("./leave");
+exports.applyLeave = async (req, res) => {
+    try {
+        const {
+            leaveType,
+            startDate,
+            endDate,
+            reason
+        } = req.body;
+        const leave = await Leave.create({
+            employee: req.user._id,
+            leaveType,
+            startDate,
+            endDate,
+            reason
+        });
+        res.status(201).json(leave)({
+            message: "Leave Applied Successfully",
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
