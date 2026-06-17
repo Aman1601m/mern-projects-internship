@@ -4,7 +4,8 @@ const { protect, authorizeRoles } = require("./authMiddleware");
 const {
     registerUser,
     loginUser,
-    getProfile
+    getProfile,
+    applyLeave
 } = require("./controllers");
 router.post("/register", registerUser);
 router.post("/login", loginUser);
@@ -18,5 +19,10 @@ router.get(
             message: "Welcome to Admin Dashboard"
         });
     }
+);
+router.post(
+    "/leave/apply",
+    protect,
+    applyLeave
 );
 module.exports = router;
