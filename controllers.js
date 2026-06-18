@@ -11,37 +11,51 @@ const generateToken = (id)=>{
 
 };
 exports.registerUser = async(req,res)=>{
+    console.log("REGISTER API HIT");
+
     const {
         username,
         email,
         password
     } = req.body;
+
     try{
+        console.log("Checking existing user...");
+
         const existingUser =
         await User.findOne({email});
+
+        console.log("Existing user:", existingUser);
+
         if(existingUser){
             return res.status(400).json({
                 message:"User already exists"
             });
         }
+
+        console.log("Creating user...");
+
         const user =
         await User.create({
             username,
             email,
             password
         });
+
+        console.log("User created:", user._id);
+
         res.status(201).json({
             message:"User registered successfully",
             token:generateToken(user._id)
         });
     }
     catch(error){
+        console.log("REGISTER ERROR:", error);
+
         res.status(500).json({
             message:error.message
         });
-
     }
-
 };
 exports.loginUser = async(req,res)=>{
     const {
@@ -106,8 +120,9 @@ exports.applyLeave = async (req, res) => {
             endDate,
             reason
         });
-        res.status(201).json(leave)({
+        res.status(201).json({
             message: "Leave Applied Successfully",
+            leave
         });
     }
     catch (error) {
