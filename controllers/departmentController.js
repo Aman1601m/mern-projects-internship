@@ -11,8 +11,6 @@ export const createDepartment = async (req, res, next) => {
         message: "Department name is required",
       });
     }
-
-    // ✅ duplicate check
     const existing = await Department.findOne({ name: req.body.name });
     if (existing) {
       return res.status(400).json({
