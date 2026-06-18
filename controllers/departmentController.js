@@ -29,6 +29,11 @@ export const createDepartment = async (req, res, next) => {
       data: dept,
     });
   } catch (err) {
+    if (err.code === 11000) {
+    return res.status(400).json({
+      message: "Duplicate department not allowed",
+    });
+  }
     next(err);
   }
 };
@@ -83,6 +88,11 @@ export const updateDepartment = async (req, res, next) => {
       data: dept,
     });
   } catch (err) {
+    if (err.code === 11000) {
+    return res.status(400).json({
+      message: "Duplicate department not allowed",
+    });
+  }
     next(err);
   }
 };
