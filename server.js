@@ -40,7 +40,7 @@ app.get("/error", (req, res) => {
   throw new Error("Test Error");
 });
 
-// Department routes
+// Department routes - Create and Get Departments
 app.use("/api/departments", departmentRoutes);
 
 /* ================== ERROR HANDLER ================== */
