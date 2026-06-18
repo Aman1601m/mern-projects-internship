@@ -5,7 +5,6 @@ export const createDepartment = async (req, res, next) => {
   try {
     console.log("Creating Department:", req.body);
 
-    // ✅ validation
     if (!req.body.name) {
       return res.status(400).json({
         message: "Department name is required",
