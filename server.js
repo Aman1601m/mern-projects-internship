@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import cors from "cors";
 
 import { errorHandler } from "./middleware/errorMiddleware.js";
+import departmentRoutes from "./routes/departmentRoutes.js";
 
 // config
 dotenv.config();
@@ -16,7 +17,7 @@ const app = express();
 // body parser
 app.use(express.json());
 
-// security middleware
+/* ================== SECURITY ================== */
 app.use(helmet());
 app.use(cors());
 
@@ -27,20 +28,26 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+/* ================== ROUTES ================== */
+
 // test route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// test error route
+// error test route
 app.get("/error", (req, res) => {
   throw new Error("Test Error");
 });
 
-// ERROR HANDLER
+// Department routes
+app.use("/api/departments", departmentRoutes);
+
+/* ================== ERROR HANDLER ================== */
+// Error handler middleware
 app.use(errorHandler);
 
-// DB connect
+/* ================== DB CONNECTION ================== */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -51,5 +58,5 @@ mongoose
     });
   })
   .catch((err) => {
-    console.log(err);
+    console.error(err);
   });
