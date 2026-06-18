@@ -14,7 +14,7 @@ export const createDepartment = async (req, res, next) => {
     const existing = await Department.findOne({
       name: req.body.name.trim(),
     });
-    
+
     const existing = await Department.findOne({ name: req.body.name });
     if (existing) {
       return res.status(400).json({
@@ -60,6 +60,11 @@ export const updateDepartment = async (req, res, next) => {
         message: "Department name is required",
       });
     }
+
+      const existing = await Department.findOne({
+      name: req.body.name.trim(),
+      _id: { $ne: req.params.id },
+    });
 
     const dept = await Department.findByIdAndUpdate(
       req.params.id,
