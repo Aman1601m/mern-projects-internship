@@ -2,11 +2,22 @@ import express from "express";
 import {
   createEmployee,
   getEmployees,
+  updateEmployee,
+  deleteEmployee,
 } from "../controllers/employeeController.js";
 
 const router = express.Router();
 
+// CREATE
 router.post("/", createEmployee);
+
+// GET ALL
 router.get("/", getEmployees);
 
-export default router;
+// UPDATE
+router.put("/:id", updateEmployee);
+
+// DELETE
+router.delete("/:id", deleteEmployee);
+
+export default router;  
