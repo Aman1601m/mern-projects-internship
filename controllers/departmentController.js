@@ -7,17 +7,19 @@ export const createDepartment = async (req, res, next) => {
 
     if (!req.body.name) {
       return res.status(400).json({
+        success: false,
         message: "Department name is required",
       });
     }
 
+    // duplicate check (only once)
     const existing = await Department.findOne({
       name: req.body.name.trim(),
     });
 
-    const existing = await Department.findOne({ name: req.body.name });
     if (existing) {
       return res.status(400).json({
+        success: false,
         message: "Department already exists",
       });
     }
@@ -30,10 +32,11 @@ export const createDepartment = async (req, res, next) => {
     });
   } catch (err) {
     if (err.code === 11000) {
-    return res.status(400).json({
-      message: "Duplicate department not allowed",
-    });
-  }
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate department not allowed",
+      });
+    }
     next(err);
   }
 };
@@ -62,14 +65,23 @@ export const updateDepartment = async (req, res, next) => {
 
     if (!req.body.name) {
       return res.status(400).json({
+        success: false,
         message: "Department name is required",
       });
     }
 
-      const existing = await Department.findOne({
+    // duplicate check (fix added)
+    const existing = await Department.findOne({
       name: req.body.name.trim(),
       _id: { $ne: req.params.id },
     });
+
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: "Department name already in use",
+      });
+    }
 
     const dept = await Department.findByIdAndUpdate(
       req.params.id,
@@ -79,6 +91,7 @@ export const updateDepartment = async (req, res, next) => {
 
     if (!dept) {
       return res.status(404).json({
+        success: false,
         message: "Department not found",
       });
     }
@@ -89,10 +102,11 @@ export const updateDepartment = async (req, res, next) => {
     });
   } catch (err) {
     if (err.code === 11000) {
-    return res.status(400).json({
-      message: "Duplicate department not allowed",
-    });
-  }
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate department not allowed",
+      });
+    }
     next(err);
   }
 };
@@ -106,6 +120,7 @@ export const deleteDepartment = async (req, res, next) => {
 
     if (!dept) {
       return res.status(404).json({
+        success: false,
         message: "Department not found",
       });
     }
