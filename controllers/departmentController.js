@@ -21,3 +21,24 @@ export const getDepartments = async (req, res, next) => {
     next(err);
   }
 };
+
+// UPDATE
+
+export const updateDepartment = async (req, res, next) => {
+  try {
+    const dept = await Department.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!dept) {
+      return res.status(404).json({ message: "Department not found" });
+    }
+
+    res.json(dept);
+  } catch (err) {
+    next(err);
+  }
+};
+
