@@ -13,7 +13,7 @@ const employeeSchema = new mongoose.Schema(
     },
     department: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Department", // 👈 relation
+      ref: "Department", 
     },
     salary: {
       type: Number,
