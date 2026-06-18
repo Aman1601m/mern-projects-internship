@@ -7,7 +7,10 @@ const {
     getProfile,
     applyLeave
 } = require("./controllers");
-router.post("/register", registerUser);
+router.post("/register", (req, res, next) => {
+    console.log("REGISTER ROUTE HIT");
+    next();
+}, registerUser);
 router.post("/login", loginUser);
 router.get("/profile", protect, getProfile);
 router.get(
@@ -25,4 +28,5 @@ router.post(
     protect,
     applyLeave
 );
+
 module.exports = router;
