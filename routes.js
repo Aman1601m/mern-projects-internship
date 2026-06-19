@@ -5,7 +5,10 @@ const {
     registerUser,
     loginUser,
     getProfile,
-    applyLeave
+    applyLeave,
+    getMyLeaves,
+    approveLeave,
+    rejectLeave
 } = require("./controllers");
 router.post("/register", (req, res, next) => {
     console.log("REGISTER ROUTE HIT");
@@ -27,6 +30,23 @@ router.post(
     "/leave/apply",
     protect,
     applyLeave
+);
+router.get(
+    "/leave/my",
+    protect,
+    getMyLeaves
+);
+registerUser.put(
+    "/leave/:id/approve",
+    protect,
+    authorizeRoles("Admin", "HR Manager"),
+    approveLeave
+);
+router.put(
+    "/leave/:id/reject",
+    protect,
+    authorizeRoles("Admin", "HR Manager"),
+    rejectLeave
 );
 
 module.exports = router;
