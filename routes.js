@@ -36,7 +36,7 @@ router.get(
     protect,
     getMyLeaves
 );
-registerUser.put(
+router.put(
     "/leave/:id/approve",
     protect,
     authorizeRoles("Admin", "HR Manager"),
