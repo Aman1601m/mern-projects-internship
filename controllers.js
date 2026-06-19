@@ -198,3 +198,15 @@ exports.rejectLeave = async (req, res) => {
         });
     }
 };
+exports.getAllLeaves = async (req, res) => {
+    try{
+        const leaves = await Leave.find()
+        .populate("employee", "username email");
+        res.status(200).json(leaves);
+    }
+    catch (error){
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
