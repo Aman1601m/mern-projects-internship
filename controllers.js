@@ -210,3 +210,32 @@ exports.getAllLeaves = async (req, res) => {
         });
     }
 };
+exports.getLeaveStats = async (req, res) => {
+    try{
+        const totalLeaves = 
+        await Leave.countDocuments();
+        const approvedLeaves =
+        await Leave.countDocuments({
+            status: "Approved"
+        });
+        const rejectedLeaves = 
+        await Leave.countDocuments({
+            status: "Rejected"
+        });
+        const pendingLeaves =
+        await Leave.countDocuments({
+            status: "Pending"
+        });
+        res.status(200).json({
+            totalLeaves,
+            approvedLeaves,
+            rejectedLeaves,
+            pendingLeaves
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
