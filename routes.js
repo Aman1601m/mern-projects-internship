@@ -10,7 +10,9 @@ const {
     approveLeave,
     rejectLeave,
     getAllLeaves,
-    getLeaveStats
+    getLeaveStats,
+    getAllEmployees,
+    getEmployeeById
 } = require("./controllers");
 router.post("/register", (req, res, next) => {
     console.log("REGISTER ROUTE HIT");
@@ -62,6 +64,18 @@ router.get(
     protect,
     authorizeRoles("Admin", "HR Manager"),
     getLeaveStats
+);
+router.get(
+    "/employees",
+    protect,
+    authorizeRoles("Admin", "HR Manager"),
+    getAllEmployees
+);
+router.get(
+    "/employees/:id",
+    protect,
+    authorizeRoles("Admin", "HR Manager"),
+    getEmployeeById
 );
 
 module.exports = router;

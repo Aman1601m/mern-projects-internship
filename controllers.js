@@ -239,3 +239,33 @@ exports.getLeaveStats = async (req, res) => {
         });
     }
 };
+exports.getAllEmployees = async (req, res) => {
+    try{
+        const employees = await User.find({})
+        .select("-password");
+        res.status(200).json(employees);
+    }
+    catch (error){
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+exports.getEmployeeById = async (req, res) => {
+    try {
+        const employee = await User.findById(
+        req.params.id
+        ).select("-password");
+        if (!employee) {
+            return res.status(404).json({
+             message: "Employee not found"
+            });
+        }
+        res.status(200).json(employee);
+    } 
+    catch (error) {
+        res.status(500).json({
+        message: error.message
+        });
+    }
+};
