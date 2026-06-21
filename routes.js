@@ -12,7 +12,11 @@ const {
     getAllLeaves,
     getLeaveStats,
     getAllEmployees,
-    getEmployeeById
+    getEmployeeById,
+    updateEmployeeRole,
+    employeeStats,
+    updateProfile,
+    changePassword
 } = require("./controllers");
 router.post("/register", (req, res, next) => {
     console.log("REGISTER ROUTE HIT");
@@ -76,6 +80,28 @@ router.get(
     protect,
     authorizeRoles("Admin", "HR Manager"),
     getEmployeeById
+);
+router.put(
+    "/employees/:id/role",
+    protect,
+    authorizeRoles("Admin"),
+    updateEmployeeRole
+);
+router.get(
+    "/employees/stats",
+    protect,
+    authorizeRoles("Admin", "HR Manager"),
+    employeeStats
+);
+router.put(
+    "/profile/update",
+    protect,
+    updateProfile
+);
+router.put(
+    "/profile/change-password",
+    protect,
+    changePassword
 );
 
 module.exports = router;

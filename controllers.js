@@ -269,3 +269,102 @@ exports.getEmployeeById = async (req, res) => {
         });
     }
 };
+exports.updateEmployeeRole = async (req, res) => {
+    try {
+        const employee = await User.findById(
+            req.params.id
+        );
+        if (!employee) {
+            return res.status(404).json({
+            message: "Employee not found"
+            });
+        }
+        employee.role = req.body.role;
+        await employee.save();
+        res.status(200).json({
+        message: "Role updated successfully",
+        employee
+        });
+    } 
+    catch (error) {
+        res.status(500).json({
+        message: error.message
+        });
+    }
+};
+exports.employeeStats = async (req, res) => {
+    try {
+        const totalEmployees =
+            await User.countDocuments();
+        const admins =
+            await User.countDocuments({
+            role: "Admin"
+            });
+        const hrManagers =
+            await User.countDocuments({
+                role: "HR Manager"
+            });
+        const employees =
+            await User.countDocuments({
+            role: "Employee"
+            });
+        res.status(200).json({
+            totalEmployees,
+            admins,
+            hrManagers,
+            employees
+        });
+    } 
+    catch (error) {
+        res.status(500).json({
+        message: error.message
+        });
+    }
+};
+exports.updateProfile = async (req, res) => {
+    try {
+        const user = await User.findById(
+            req.user._id
+        );
+        user.username =
+            req.body.username || user.username;
+        user.email =
+            req.body.email || user.email;
+        await user.save();
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user
+        });
+    } 
+    catch (error) {
+        res.status(500).json({
+        message: error.message
+        });
+    }
+};
+exports.changePassword = async (req, res) => {
+    try {
+        const user = await User.findById(
+            req.user._id
+        ).select("+password");
+        const isMatch =
+            await user.matchPassword(
+            req.body.currentPassword
+            );
+        if (!isMatch) {
+            return res.status(400).json({
+            message: "Current password incorrect"
+            });
+        }
+        user.password = req.body.newPassword;
+        await user.save();
+        res.status(200).json({
+        message: "Password changed successfully"
+        });
+    } 
+    catch (error) {
+        res.status(500).json({
+        message: error.message
+        });
+    }
+};
