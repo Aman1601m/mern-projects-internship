@@ -24,6 +24,14 @@ export const createEmployee = async (req, res, next) => {
 // ================= GET ALL =================
 export const getEmployees = async (req, res, next) => {
   try {
+
+    const { search } = req.query;
+
+    let query = {};
+
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
     const emps = await Employee.find().populate("department");
 
     res.json({
