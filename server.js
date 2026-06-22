@@ -9,6 +9,7 @@ import cors from "cors";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 // config
 dotenv.config();
@@ -44,6 +45,7 @@ app.get("/error", (req, res) => {
 // Department routes - Create and Get Departments
 app.use("/api/departments", departmentRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/auth", authRoutes);
 
 /* ================== ERROR HANDLER ================== */
 // Error handler middleware
