@@ -1,48 +1,80 @@
 import User from "../models/User.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 // REGISTER
-export const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
-
+export const registerUser = async (req, res, next) => {
   try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields required",
+      });
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    // password hash
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role,
     });
 
-    res.json({ message: "User registered", user });
+    res.status(201).json({
+      success: true,
+      message: "User registered",
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 };
 
 // LOGIN
-export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
+export const loginUser = async (req, res, next) => {
   try {
+    const { email, password } = req.body;
+
     const user = await User.findOne({ email });
 
-    if (!user) return res.status(404).json({ msg: "User not found" });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) return res.status(400).json({ msg: "Invalid password" });
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
 
+    // JWT token
     const token = jwt.sign(
-      { id: user._id, role: user.role },
-      "secret123",
+      { id: user._id },
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    res.json({ token, user });
+    res.json({
+      success: true,
+      token,
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 };
