@@ -24,25 +24,46 @@ export const createEmployee = async (req, res, next) => {
 // ================= GET ALL =================
 export const getEmployees = async (req, res, next) => {
   try {
-
-    const { search } = req.query;
+    const { search, department, page = 1, limit = 5 } = req.query;
 
     let query = {};
 
+    // SEARCH (by name)
     if (search) {
       query.name = { $regex: search, $options: "i" };
     }
-    const emps = await Employee.find().populate("department");
+
+    // FILTER (by department)
+    if (department) {
+      query.department = department;
+    }
+
+    // PAGINATION
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // DB call
+    const emps = await Employee.find(query)
+      .populate("department")
+      .skip(skip)
+      .limit(limitNumber);
+
+    // total count
+    const total = await Employee.countDocuments(query);
 
     res.json({
       success: true,
+      total,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
       data: emps,
     });
+
   } catch (err) {
     next(err);
   }
 };
-
 // ================= UPDATE =================
 export const updateEmployee = async (req, res, next) => {
   try {
