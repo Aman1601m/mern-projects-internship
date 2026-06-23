@@ -5,19 +5,13 @@ import {
   updateEmployee,
   deleteEmployee,
 } from "../controllers/employeeController.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// CREATE
-router.post("/", createEmployee);
+router.post("/", protect, createEmployee);
+router.get("/", protect, getEmployees);
+router.put("/:id", protect, updateEmployee);
+router.delete("/:id", protect, deleteEmployee);
 
-// GET ALL
-router.get("/", getEmployees);
-
-// UPDATE
-router.put("/:id", updateEmployee);
-
-// DELETE
-router.delete("/:id", deleteEmployee);
-
-export default router;  
+export default router;
