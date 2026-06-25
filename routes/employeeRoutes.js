@@ -5,17 +5,42 @@ import {
   updateEmployee,
   deleteEmployee,
 } from "../controllers/employeeController.js";
+
 import { protect } from "../middleware/authMiddleware.js";
-import { authorizeRoles } from "../middleware/roleMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", protect, authorizeRoles("admin", "hr"), createEmployee);
+// Create Employee
+router.post(
+  "/",
+  protect,
+  checkPermission("create_employee"),
+  createEmployee
+);
 
-router.get("/", protect, getEmployees);
+// View Employees
+router.get(
+  "/",
+  protect,
+  checkPermission("view_employee"),
+  getEmployees
+);
 
-router.put("/:id", protect, authorizeRoles("admin", "hr"), updateEmployee);
+// Update Employee
+router.put(
+  "/:id",
+  protect,
+  checkPermission("update_employee"),
+  updateEmployee
+);
 
-router.delete("/:id", protect, authorizeRoles("admin"), deleteEmployee);
+// Delete Employee
+router.delete(
+  "/:id",
+  protect,
+  checkPermission("delete_employee"),
+  deleteEmployee
+);
 
 export default router;
