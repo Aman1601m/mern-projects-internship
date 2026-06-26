@@ -6,7 +6,19 @@ export const createEmployee = async (req, res, next) => {
     if (!req.body.name || !req.body.email) {
       return res.status(400).json({
         success: false,
-        message: "Name and Email required",
+        message: "Name and Email are required",
+      });
+    }
+
+    // Duplicate Email Check
+    const existing = await Employee.findOne({
+      email: req.body.email,
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: "Employee already exists with this email",
       });
     }
 
@@ -19,6 +31,7 @@ export const createEmployee = async (req, res, next) => {
       success: true,
       data: emp,
     });
+
   } catch (err) {
     next(err);
   }
@@ -27,32 +40,38 @@ export const createEmployee = async (req, res, next) => {
 // ================= GET ALL =================
 export const getEmployees = async (req, res, next) => {
   try {
-    const { search, department, page = 1, limit = 5 } = req.query;
+
+    const {
+      search,
+      department,
+      page = 1,
+      limit = 5,
+    } = req.query;
 
     let query = {};
 
-    // SEARCH (by name)
+    // Search by Name
     if (search) {
-      query.name = { $regex: search, $options: "i" };
+      query.name = {
+        $regex: search,
+        $options: "i",
+      };
     }
 
-    // FILTER (by department)
+    // Filter by Department
     if (department) {
       query.department = department;
     }
 
-    // PAGINATION
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
 
-    // DB call
     const emps = await Employee.find(query)
       .populate("department")
       .skip(skip)
       .limit(limitNumber);
 
-    // total count
     const total = await Employee.countDocuments(query);
 
     res.json({
@@ -67,17 +86,19 @@ export const getEmployees = async (req, res, next) => {
     next(err);
   }
 };
+
 // ================= UPDATE =================
 export const updateEmployee = async (req, res, next) => {
   try {
+
     if (!req.body.name || !req.body.email) {
       return res.status(400).json({
         success: false,
-        message: "Name and Email required",
+        message: "Name and Email are required",
       });
     }
 
-    // duplicate email check
+    // Duplicate Email Check
     const existing = await Employee.findOne({
       email: req.body.email,
       _id: { $ne: req.params.id },
@@ -86,13 +107,22 @@ export const updateEmployee = async (req, res, next) => {
     if (existing) {
       return res.status(400).json({
         success: false,
-        message: "Email already in use",
+        message: "Email already exists",
       });
+    }
+
+    const updateData = {
+      ...req.body,
+    };
+
+    // Update Image if Uploaded
+    if (req.file) {
+      updateData.profileImage = req.file.filename;
     }
 
     const emp = await Employee.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true }
     );
 
@@ -107,6 +137,7 @@ export const updateEmployee = async (req, res, next) => {
       success: true,
       data: emp,
     });
+
   } catch (err) {
     next(err);
   }
@@ -115,7 +146,10 @@ export const updateEmployee = async (req, res, next) => {
 // ================= DELETE =================
 export const deleteEmployee = async (req, res, next) => {
   try {
-    const emp = await Employee.findByIdAndDelete(req.params.id);
+
+    const emp = await Employee.findByIdAndDelete(
+      req.params.id
+    );
 
     if (!emp) {
       return res.status(404).json({
@@ -128,6 +162,7 @@ export const deleteEmployee = async (req, res, next) => {
       success: true,
       message: "Employee deleted successfully",
     });
+
   } catch (err) {
     next(err);
   }

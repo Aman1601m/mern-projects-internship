@@ -7,42 +7,43 @@ import {
 } from "../controllers/employeeController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
-import { checkPermission } from "../middleware/permissionMiddleware.js";
+import { authorizeRoles } from "../middleware/roleMiddleware.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-// Create Employee
+// ================= CREATE =================
 router.post(
-    "/",
-    protect,
-    authorizeRoles("admin","hr"),
-    upload.single("profileImage"),
-    createEmployee
+  "/",
+  protect,
+  authorizeRoles("admin", "hr"),
+  upload.single("profileImage"),
+  createEmployee
 );
-// View Employees
+
+// ================= GET ALL =================
 router.get(
   "/",
   protect,
-  checkPermission("view_employee"),
+  authorizeRoles("admin", "hr", "employee"),
   getEmployees
 );
 
-// Update Employee
+// ================= UPDATE =================
 router.put(
   "/:id",
   protect,
-  checkPermission("update_employee"),
+  authorizeRoles("admin", "hr"),
+  upload.single("profileImage"),
   updateEmployee
 );
 
-// Delete Employee
+// ================= DELETE =================
 router.delete(
   "/:id",
   protect,
-  checkPermission("delete_employee"),
+  authorizeRoles("admin"),
   deleteEmployee
 );
-
 
 export default router;
