@@ -18,6 +18,10 @@ const employeeSchema = new mongoose.Schema(
     salary: {
       type: Number,
     },
+    profileImage: {
+    type: String,
+    default: "",
+    },
   },
   { timestamps: true }
 );
