@@ -8,17 +8,18 @@ import {
 
 import { protect } from "../middleware/authMiddleware.js";
 import { checkPermission } from "../middleware/permissionMiddleware.js";
+import { upload } from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
 // Create Employee
 router.post(
-  "/",
-  protect,
-  checkPermission("create_employee"),
-  createEmployee
+    "/",
+    protect,
+    authorizeRoles("admin","hr"),
+    upload.single("profileImage"),
+    createEmployee
 );
-
 // View Employees
 router.get(
   "/",
@@ -42,5 +43,6 @@ router.delete(
   checkPermission("delete_employee"),
   deleteEmployee
 );
+
 
 export default router;

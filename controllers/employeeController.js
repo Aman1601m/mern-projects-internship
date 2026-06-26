@@ -10,7 +10,10 @@ export const createEmployee = async (req, res, next) => {
       });
     }
 
-    const emp = await Employee.create(req.body);
+    const emp = await Employee.create({
+      ...req.body,
+      profileImage: req.file ? req.file.filename : "",
+    });
 
     res.status(201).json({
       success: true,

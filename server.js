@@ -10,6 +10,7 @@ import { errorHandler } from "./middleware/errorMiddleware.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import path from "path";
 
 // config
 dotenv.config();
@@ -46,6 +47,7 @@ app.get("/error", (req, res) => {
 app.use("/api/departments", departmentRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/uploads",express.static("uploads"));
 
 /* ================== ERROR HANDLER ================== */
 // Error handler middleware
