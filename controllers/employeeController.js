@@ -143,6 +143,28 @@ export const updateEmployee = async (req, res, next) => {
   }
 };
 
+// ================= GET SINGLE =================
+export const getEmployeeById = async (req, res, next) => {
+  try {
+    const emp = await Employee.findById(req.params.id).populate("department");
+
+    if (!emp) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: emp,
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
 // ================= DELETE =================
 export const deleteEmployee = async (req, res, next) => {
   try {
