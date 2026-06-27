@@ -30,6 +30,13 @@ router.get(
   getEmployees
 );
 
+router.get(
+  "/:id",
+  protect,
+  authorizeRoles("admin", "hr", "employee"),
+  getEmployeeById
+);
+
 // ================= UPDATE =================
 router.put(
   "/:id",
