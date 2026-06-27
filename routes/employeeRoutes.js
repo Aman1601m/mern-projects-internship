@@ -2,6 +2,7 @@ import express from "express";
 import {
   createEmployee,
   getEmployees,
+  getEmployeeById,
   updateEmployee,
   deleteEmployee,
 } from "../controllers/employeeController.js";
