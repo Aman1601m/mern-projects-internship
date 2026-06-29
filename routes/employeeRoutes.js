@@ -5,6 +5,7 @@ import {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  getDashboardStats,
 } from "../controllers/employeeController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -52,6 +53,13 @@ router.delete(
   protect,
   authorizeRoles("admin"),
   deleteEmployee
+);
+
+router.get(
+  "/dashboard/stats",
+  protect,
+  authorizeRoles("admin", "hr"),
+  getDashboardStats
 );
 
 export default router;
