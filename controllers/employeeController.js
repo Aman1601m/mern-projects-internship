@@ -1,8 +1,17 @@
 import Employee from "../models/Employee.js";
+import { validationResult } from "express-validator";
 
 // ================= CREATE =================
 export const createEmployee = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
     if (!req.body.name || !req.body.email) {
       return res.status(400).json({
         success: false,
