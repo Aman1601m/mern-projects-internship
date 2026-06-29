@@ -217,3 +217,34 @@ export const getDashboardStats = async (req, res, next) => {
     next(err);
   }
 };
+
+// ================= SALARY SUMMARY =================
+export const getSalarySummary = async (req, res, next) => {
+  try {
+
+    const summary = await Employee.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalSalary: { $sum: "$salary" },
+          averageSalary: { $avg: "$salary" },
+          highestSalary: { $max: "$salary" },
+          lowestSalary: { $min: "$salary" },
+        },
+      },
+    ]);
+
+    res.json({
+      success: true,
+      data: summary[0] || {
+        totalSalary: 0,
+        averageSalary: 0,
+        highestSalary: 0,
+        lowestSalary: 0,
+      },
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
