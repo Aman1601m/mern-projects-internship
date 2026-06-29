@@ -38,6 +38,14 @@ router.get(
   getEmployeeById
 );
 
+// ================= DASHBOARD =================
+router.get(
+  "/dashboard/stats",
+  protect,
+  authorizeRoles("admin", "hr"),
+  getDashboardStats
+);
+
 // ================= UPDATE =================
 router.put(
   "/:id",
@@ -53,13 +61,6 @@ router.delete(
   protect,
   authorizeRoles("admin"),
   deleteEmployee
-);
-
-router.get(
-  "/dashboard/stats",
-  protect,
-  authorizeRoles("admin", "hr"),
-  getDashboardStats
 );
 
 export default router;
