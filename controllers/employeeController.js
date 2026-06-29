@@ -189,3 +189,31 @@ export const deleteEmployee = async (req, res, next) => {
     next(err);
   }
 };
+// ================= DASHBOARD =================
+export const getDashboardStats = async (req, res, next) => {
+  try {
+    const totalEmployees = await Employee.countDocuments();
+
+    const totalDepartments = await Department.countDocuments();
+
+    const totalSalary = await Employee.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$salary" },
+        },
+      },
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalEmployees,
+        totalDepartments,
+        totalSalary: totalSalary[0]?.total || 0,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
