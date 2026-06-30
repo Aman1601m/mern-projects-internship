@@ -70,3 +70,42 @@ export const getPayrollById = async (req, res, next) => {
     next(err);
   }
 };
+// ================= UPDATE PAYROLL =================
+export const updatePayroll = async (req, res, next) => {
+  try {
+    const {
+      basicSalary,
+      bonus = 0,
+      deduction = 0,
+    } = req.body;
+
+    const netSalary =
+      Number(basicSalary) +
+      Number(bonus) -
+      Number(deduction);
+
+    const payroll = await Payroll.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...req.body,
+        netSalary,
+      },
+      { new: true }
+    );
+
+    if (!payroll) {
+      return res.status(404).json({
+        success: false,
+        message: "Payroll not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: payroll,
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
