@@ -1,4 +1,5 @@
 import Employee from "../models/Employee.js";
+import Department from "../models/Department.js";
 import { validationResult } from "express-validator";
 
 // ================= CREATE =================
@@ -12,6 +13,7 @@ export const createEmployee = async (req, res, next) => {
         errors: errors.array(),
       });
     }
+
     if (!req.body.name || !req.body.email) {
       return res.status(400).json({
         success: false,
@@ -40,7 +42,6 @@ export const createEmployee = async (req, res, next) => {
       success: true,
       data: emp,
     });
-
   } catch (err) {
     next(err);
   }
@@ -49,7 +50,6 @@ export const createEmployee = async (req, res, next) => {
 // ================= GET ALL =================
 export const getEmployees = async (req, res, next) => {
   try {
-
     const {
       search,
       department,
@@ -59,7 +59,7 @@ export const getEmployees = async (req, res, next) => {
 
     let query = {};
 
-    // Search by Name
+    // Search
     if (search) {
       query.name = {
         $regex: search,
@@ -67,7 +67,7 @@ export const getEmployees = async (req, res, next) => {
       };
     }
 
-    // Filter by Department
+    // Filter
     if (department) {
       query.department = department;
     }
@@ -76,19 +76,41 @@ export const getEmployees = async (req, res, next) => {
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
 
-    const emps = await Employee.find(query)
+    const employees = await Employee.find(query)
       .populate("department")
       .skip(skip)
       .limit(limitNumber);
 
     const total = await Employee.countDocuments(query);
 
-    res.json({
+    res.status(200).json({
       success: true,
       total,
       page: pageNumber,
       pages: Math.ceil(total / limitNumber),
-      data: emps,
+      data: employees,
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ================= GET SINGLE =================
+export const getEmployeeById = async (req, res, next) => {
+  try {
+    const emp = await Employee.findById(req.params.id).populate("department");
+
+    if (!emp) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: emp,
     });
 
   } catch (err) {
@@ -99,6 +121,14 @@ export const getEmployees = async (req, res, next) => {
 // ================= UPDATE =================
 export const updateEmployee = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
 
     if (!req.body.name || !req.body.email) {
       return res.status(400).json({
@@ -124,7 +154,7 @@ export const updateEmployee = async (req, res, next) => {
       ...req.body,
     };
 
-    // Update Image if Uploaded
+    // Update Profile Image
     if (req.file) {
       updateData.profileImage = req.file.filename;
     }
@@ -142,29 +172,7 @@ export const updateEmployee = async (req, res, next) => {
       });
     }
 
-    res.json({
-      success: true,
-      data: emp,
-    });
-
-  } catch (err) {
-    next(err);
-  }
-};
-
-// ================= GET SINGLE =================
-export const getEmployeeById = async (req, res, next) => {
-  try {
-    const emp = await Employee.findById(req.params.id).populate("department");
-
-    if (!emp) {
-      return res.status(404).json({
-        success: false,
-        message: "Employee not found",
-      });
-    }
-
-    res.json({
+    res.status(200).json({
       success: true,
       data: emp,
     });
@@ -177,10 +185,7 @@ export const getEmployeeById = async (req, res, next) => {
 // ================= DELETE =================
 export const deleteEmployee = async (req, res, next) => {
   try {
-
-    const emp = await Employee.findByIdAndDelete(
-      req.params.id
-    );
+    const emp = await Employee.findByIdAndDelete(req.params.id);
 
     if (!emp) {
       return res.status(404).json({
@@ -189,7 +194,7 @@ export const deleteEmployee = async (req, res, next) => {
       });
     }
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: "Employee deleted successfully",
     });
@@ -198,6 +203,7 @@ export const deleteEmployee = async (req, res, next) => {
     next(err);
   }
 };
+
 // ================= DASHBOARD =================
 export const getDashboardStats = async (req, res, next) => {
   try {
@@ -214,7 +220,7 @@ export const getDashboardStats = async (req, res, next) => {
       },
     ]);
 
-    res.json({
+    res.status(200).json({
       success: true,
       data: {
         totalEmployees,
@@ -222,6 +228,7 @@ export const getDashboardStats = async (req, res, next) => {
         totalSalary: totalSalary[0]?.total || 0,
       },
     });
+
   } catch (err) {
     next(err);
   }
@@ -230,7 +237,6 @@ export const getDashboardStats = async (req, res, next) => {
 // ================= SALARY SUMMARY =================
 export const getSalarySummary = async (req, res, next) => {
   try {
-
     const summary = await Employee.aggregate([
       {
         $group: {
@@ -243,7 +249,7 @@ export const getSalarySummary = async (req, res, next) => {
       },
     ]);
 
-    res.json({
+    res.status(200).json({
       success: true,
       data: summary[0] || {
         totalSalary: 0,

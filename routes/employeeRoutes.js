@@ -1,4 +1,6 @@
 import express from "express";
+import { body } from "express-validator";
+
 import {
   createEmployee,
   getEmployees,
@@ -12,33 +14,33 @@ import {
 import { protect } from "../middleware/authMiddleware.js";
 import { authorizeRoles } from "../middleware/roleMiddleware.js";
 import { upload } from "../middleware/uploadMiddleware.js";
-import { body } from "express-validator";
 
 const router = express.Router();
 
-// ================= CREATE =================
-router.post(
-  "/",
-  protect,
-  authorizeRoles("admin", "hr"),
-  upload.single("profileImage"),
-  createEmployee
-);
-
+// ================= CREATE EMPLOYEE =================
 router.post(
   "/",
   protect,
   authorizeRoles("admin", "hr"),
   upload.single("profileImage"),
   [
-    body("name").notEmpty().withMessage("Name is required"),
-    body("email").isEmail().withMessage("Valid email is required"),
-    body("salary").optional().isNumeric().withMessage("Salary must be a number"),
+    body("name")
+      .notEmpty()
+      .withMessage("Name is required"),
+
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required"),
+
+    body("salary")
+      .optional()
+      .isNumeric()
+      .withMessage("Salary must be a number"),
   ],
   createEmployee
 );
 
-// ================= GET ALL =================
+// ================= GET ALL EMPLOYEES =================
 router.get(
   "/",
   protect,
@@ -46,6 +48,7 @@ router.get(
   getEmployees
 );
 
+// ================= GET SINGLE EMPLOYEE =================
 router.get(
   "/:id",
   protect,
@@ -53,7 +56,38 @@ router.get(
   getEmployeeById
 );
 
-// ================= DASHBOARD =================
+// ================= UPDATE EMPLOYEE =================
+router.put(
+  "/:id",
+  protect,
+  authorizeRoles("admin", "hr"),
+  upload.single("profileImage"),
+  [
+    body("name")
+      .notEmpty()
+      .withMessage("Name is required"),
+
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required"),
+
+    body("salary")
+      .optional()
+      .isNumeric()
+      .withMessage("Salary must be a number"),
+  ],
+  updateEmployee
+);
+
+// ================= DELETE EMPLOYEE =================
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  deleteEmployee
+);
+
+// ================= DASHBOARD STATS =================
 router.get(
   "/dashboard/stats",
   protect,
@@ -61,28 +95,12 @@ router.get(
   getDashboardStats
 );
 
+// ================= SALARY SUMMARY =================
 router.get(
   "/dashboard/salary-summary",
   protect,
   authorizeRoles("admin", "hr"),
   getSalarySummary
-);
-
-// ================= UPDATE =================
-router.put(
-  "/:id",
-  protect,
-  authorizeRoles("admin", "hr"),
-  upload.single("profileImage"),
-  updateEmployee
-);
-
-// ================= DELETE =================
-router.delete(
-  "/:id",
-  protect,
-  authorizeRoles("admin"),
-  deleteEmployee
 );
 
 export default router;
