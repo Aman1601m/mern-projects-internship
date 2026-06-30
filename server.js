@@ -11,6 +11,7 @@ import departmentRoutes from "./routes/departmentRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import path from "path";
+import payrollRoutes from "./routes/payrollRoutes.js";
 
 // config
 dotenv.config();
@@ -48,6 +49,7 @@ app.use("/api/departments", departmentRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/uploads",express.static("uploads"));
+app.use("/api/payroll", payrollRoutes);
 
 /* ================== ERROR HANDLER ================== */
 // Error handler middleware
