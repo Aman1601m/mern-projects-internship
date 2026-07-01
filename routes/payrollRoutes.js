@@ -5,6 +5,7 @@ import {
   getPayrollById,
   updatePayroll,
   deletePayroll,
+  generatePayslip,
 } from "../controllers/payrollController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -18,8 +19,11 @@ router.get("/", protect, authorizeRoles("admin", "hr"), getPayrolls);
 
 router.get("/:id", protect, authorizeRoles("admin", "hr"), getPayrollById);
 
+router.get("/:id/payslip", protect, authorizeRoles("admin", "hr", "employee"),generatePayslip);
+
 router.put("/:id", protect, authorizeRoles("admin", "hr"), updatePayroll);
 
 router.delete("/:id", protect, authorizeRoles("admin"), deletePayroll);
+
 
 export default router;
