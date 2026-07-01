@@ -7,6 +7,7 @@ import connectDB from "./config/db.js";
 import testRoutes from "./routes/testRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js";
+import departmentRoutes from "./routes/departmentRoutes.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(cors());
 app.use("/api/test", testRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/departments", departmentRoutes);
 
 // Base Route
 app.get("/", (req, res) => {
