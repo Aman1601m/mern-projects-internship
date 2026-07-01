@@ -36,13 +36,20 @@ const employeeSchema = new mongoose.Schema(
     },
 
     department: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
       required: true,
     },
 
     designation: {
       type: String,
       required: true,
+    },
+
+    manager: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+      default: null,
     },
 
     joiningDate: {

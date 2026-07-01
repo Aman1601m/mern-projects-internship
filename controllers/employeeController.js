@@ -1,7 +1,10 @@
 import Employee from "../models/Employee.js";
+import Department from "../models/Department.js";
 
 /**
- * Create Employee
+ * @desc Create Employee
+ * @route POST /api/employees
+ * @access HR Manager / Admin
  */
 export const createEmployee = async (req, res) => {
   try {
@@ -13,11 +16,13 @@ export const createEmployee = async (req, res) => {
       phone,
       department,
       designation,
+      manager,
       joiningDate,
       salary,
       status,
     } = req.body;
 
+    // Required field validation
     if (
       !employeeId ||
       !firstName ||
@@ -35,17 +40,29 @@ export const createEmployee = async (req, res) => {
       });
     }
 
-    const employeeExists = await Employee.findOne({
+    // Check duplicate employee
+    const existingEmployee = await Employee.findOne({
       $or: [{ employeeId }, { email }],
     });
 
-    if (employeeExists) {
+    if (existingEmployee) {
       return res.status(400).json({
         success: false,
         message: "Employee already exists.",
       });
     }
 
+    // Verify Department exists
+    const departmentExists = await Department.findById(department);
+
+    if (!departmentExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Department not found.",
+      });
+    }
+
+    // Create Employee
     const employee = await Employee.create({
       employeeId,
       firstName,
@@ -54,15 +71,21 @@ export const createEmployee = async (req, res) => {
       phone,
       department,
       designation,
+      manager: manager || null,
       joiningDate,
       salary,
       status,
     });
 
+    // Populate department before returning
+    const populatedEmployee = await Employee.findById(employee._id)
+      .populate("department")
+      .populate("manager", "firstName lastName email");
+
     res.status(201).json({
       success: true,
       message: "Employee created successfully.",
-      data: employee,
+      data: populatedEmployee,
     });
   } catch (error) {
     console.error(error);
@@ -75,17 +98,62 @@ export const createEmployee = async (req, res) => {
 };
 
 /**
- * Get All Employees
+ * @desc Get All Employees
+ * @route GET /api/employees
+ * @access HR Manager
  */
 export const getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find().sort({
-      createdAt: -1,
-    });
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const keyword = req.query.search
+      ? {
+          $or: [
+            {
+              firstName: {
+                $regex: req.query.search,
+                $options: "i",
+              },
+            },
+            {
+              lastName: {
+                $regex: req.query.search,
+                $options: "i",
+              },
+            },
+            {
+              employeeId: {
+                $regex: req.query.search,
+                $options: "i",
+              },
+            },
+            {
+              email: {
+                $regex: req.query.search,
+                $options: "i",
+              },
+            },
+          ],
+        }
+      : {};
+
+    const totalEmployees = await Employee.countDocuments(keyword);
+
+    const employees = await Employee.find(keyword)
+      .populate("department")
+      .populate("manager", "firstName lastName")
+      .sort({
+        createdAt: -1,
+      })
+      .skip((page - 1) * limit)
+      .limit(limit);
 
     res.status(200).json({
       success: true,
-      count: employees.length,
+      page,
+      totalPages: Math.ceil(totalEmployees / limit),
+      totalEmployees,
       data: employees,
     });
   } catch (error) {
@@ -97,9 +165,39 @@ export const getEmployees = async (req, res) => {
 };
 
 /**
- * Get Employee By Id
+ * @desc Get Employee By ID
+ * @route GET /api/employees/:id
  */
 export const getEmployeeById = async (req, res) => {
+  try {
+    const employee = await Employee.findById(req.params.id)
+      .populate("department")
+      .populate("manager", "firstName lastName email");
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: employee,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * @desc Update Employee
+ * @route PUT /api/employees/:id
+ */
+export const updateEmployee = async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id);
 
@@ -110,43 +208,18 @@ export const getEmployeeById = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      success: true,
-      data: employee,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+    Object.assign(employee, req.body);
 
-/**
- * Update Employee
- */
-export const updateEmployee = async (req, res) => {
-  try {
-    const employee = await Employee.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    await employee.save();
 
-    if (!employee) {
-      return res.status(404).json({
-        success: false,
-        message: "Employee not found.",
-      });
-    }
+    const updatedEmployee = await Employee.findById(employee._id)
+      .populate("department")
+      .populate("manager", "firstName lastName");
 
     res.status(200).json({
       success: true,
       message: "Employee updated successfully.",
-      data: employee,
+      data: updatedEmployee,
     });
   } catch (error) {
     res.status(500).json({
@@ -157,7 +230,8 @@ export const updateEmployee = async (req, res) => {
 };
 
 /**
- * Delete Employee
+ * @desc Delete Employee
+ * @route DELETE /api/employees/:id
  */
 export const deleteEmployee = async (req, res) => {
   try {
