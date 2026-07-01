@@ -1,4 +1,5 @@
 import Payroll from "../models/Payroll.js";
+import PDFDocument from "pdfkit";
 
 export const createPayroll = async (req, res, next) => {
   try {
@@ -125,6 +126,58 @@ export const deletePayroll = async (req, res, next) => {
       success: true,
       message: "Payroll deleted successfully",
     });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const generatePayslip = async (req, res, next) => {
+  try {
+    const payroll = await Payroll.findById(req.params.id)
+      .populate("employee");
+
+    if (!payroll) {
+      return res.status(404).json({
+        success: false,
+        message: "Payroll not found",
+      });
+    }
+
+    const doc = new PDFDocument();
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=payslip-${payroll.employee.name}.pdf`
+    );
+
+    res.setHeader("Content-Type", "application/pdf");
+
+    doc.pipe(res);
+
+    doc.fontSize(22).text("Employee Payslip", {
+      align: "center",
+    });
+
+    doc.moveDown();
+
+    doc.fontSize(14).text(`Employee : ${payroll.employee.name}`);
+    doc.text(`Month : ${payroll.month}`);
+    doc.text(`Year : ${payroll.year}`);
+
+    doc.moveDown();
+
+    doc.text(`Basic Salary : ₹${payroll.basicSalary}`);
+    doc.text(`Bonus : ₹${payroll.bonus}`);
+    doc.text(`Deduction : ₹${payroll.deduction}`);
+
+    doc.moveDown();
+
+    doc.fontSize(16).text(
+      `Net Salary : ₹${payroll.netSalary}`
+    );
+
+    doc.end();
 
   } catch (err) {
     next(err);
