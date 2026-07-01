@@ -1,11 +1,16 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+
 import connectDB from "./config/db.js";
+
 import testRoutes from "./routes/testRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import employeeRoutes from "./routes/employeeRoutes.js";
 
 dotenv.config();
+
+// Connect Database
 connectDB();
 
 const app = express();
@@ -17,14 +22,23 @@ app.use(cors());
 // Routes
 app.use("/api/test", testRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/employees", employeeRoutes);
 
 // Base Route
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.send("Enterprise HRMS Backend API Running...");
+});
+
+// 404 Handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route Not Found",
+  });
 });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
