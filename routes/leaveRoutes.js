@@ -1,9 +1,10 @@
 import express from "express";
-
 import {
   applyLeave,
   getLeaves,
+  getLeaveById,
   updateLeaveStatus,
+  deleteLeave,
 } from "../controllers/leaveController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -19,7 +20,7 @@ router.post(
   applyLeave
 );
 
-// HR/Admin View Leaves
+// HR/Admin View All Leaves
 router.get(
   "/",
   protect,
@@ -27,12 +28,28 @@ router.get(
   getLeaves
 );
 
-// HR/Admin Approve or Reject
+// Get Single Leave
+router.get(
+  "/:id",
+  protect,
+  authorizeRoles("admin", "hr", "employee"),
+  getLeaveById
+);
+
+// Approve / Reject Leave
 router.put(
   "/:id",
   protect,
   authorizeRoles("admin", "hr"),
   updateLeaveStatus
+);
+
+// Delete Leave
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  deleteLeave
 );
 
 export default router;

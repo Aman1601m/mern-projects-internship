@@ -29,6 +29,27 @@ export const getLeaves = async (req, res, next) => {
   }
 };
 
+// Get Single Leave
+export const getLeaveById = async (req, res, next) => {
+  try {
+    const leave = await Leave.findById(req.params.id).populate("employee");
+
+    if (!leave) {
+      return res.status(404).json({
+        success: false,
+        message: "Leave request not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: leave,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Update Leave Status
 export const updateLeaveStatus = async (req, res, next) => {
   try {
@@ -37,9 +58,7 @@ export const updateLeaveStatus = async (req, res, next) => {
       {
         status: req.body.status,
       },
-      {
-        new: true,
-      }
+      { new: true }
     );
 
     if (!leave) {
@@ -53,7 +72,27 @@ export const updateLeaveStatus = async (req, res, next) => {
       success: true,
       data: leave,
     });
+  } catch (err) {
+    next(err);
+  }
+};
 
+// Delete Leave
+export const deleteLeave = async (req, res, next) => {
+  try {
+    const leave = await Leave.findByIdAndDelete(req.params.id);
+
+    if (!leave) {
+      return res.status(404).json({
+        success: false,
+        message: "Leave request not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Leave deleted successfully",
+    });
   } catch (err) {
     next(err);
   }
