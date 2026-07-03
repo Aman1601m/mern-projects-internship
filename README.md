@@ -1,136 +1,155 @@
-#  HRMS Backend (MERN Stack)
+# Human Resource Management System (HRMS)
 
-##  Project Overview
-
-This project is a backend system for a Human Resource Management System (HRMS) built using the MERN stack. It provides APIs for managing departments, employees, and user authentication.
+A secure Human Resource Management System (HRMS) built using the MERN Stack. This project provides employee, department, leave, and payroll management with secure authentication and role-based authorization.
 
 ---
 
-##  Features
+# Features
 
-###  Authentication
+## Authentication
+- User Registration
+- User Login
+- JWT Authentication
+- Password Encryption using bcryptjs
+- Protected Routes
 
-* User Registration
-* User Login
-* JWT-based Authentication
-* Protected Routes using Middleware
+## Role-Based Access Control (RBAC)
+- Admin
+- HR
+- Employee
 
-###  Department Module
+## Employee Management
+- Add Employee
+- View Employees
+- Update Employee
+- Delete Employee
+- Search Employees
+- Pagination
+- Profile Image Upload
 
-* Create Department
-* Get All Departments
-* Update Department
-* Delete Department
-* Validation and Duplicate Checks
+## Department Management
+- Create Department
+- View Departments
+- Update Department
+- Delete Department
 
-###  Employee Module
+## Leave Management
+- Apply Leave
+- View Leave Requests
+- Approve / Reject Leave
 
-* Create Employee
-* Get Employees (with Department relation)
-* Update Employee
-* Delete Employee
+## Payroll Management
+- Create Payroll
+- View Payroll
+- Update Payroll
+- Delete Payroll
+- Salary Summary
 
-###  Advanced Features
+## Dashboard
+- Total Employees
+- Total Departments
+- Total Salary Statistics
 
-* Search (by employee name)
-* Filter (by department)
-* Pagination (for large data handling)
+## Security
+- JWT Authentication
+- Helmet Security Middleware
+- Express Rate Limiting
+- Input Validation using Express Validator
+- Global Error Handling Middleware
 
 ---
 
-##  Tech Stack
+# Tech Stack
 
-* Node.js
-* Express.js
-* MongoDB (Mongoose)
-* JWT (Authentication)
-* bcrypt.js (Password hashing)
+## Frontend
+- React.js
+- React Router DOM
+- Axios
+- Bootstrap
+- Vite
+
+## Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+
+## Security
+- JWT
+- bcryptjs
+- Helmet
+- Express Rate Limit
+
+## File Upload
+- Multer
+
+## Validation
+- Express Validator
 
 ---
 
-##  Project Structure
+# Project Structure
 
 ```
-backend/
-│── controllers/
-│── models/
-│── routes/
-│── middleware/
-│── utils/
-│── server.js
+HRMS
+│
+├── backend
+│   ├── controllers
+│   ├── middleware
+│   ├── models
+│   ├── routes
+│   ├── uploads
+│   ├── config
+│   ├── utils
+│   ├── package.json
+│   └── server.js
+│
+├── frontend
+│   ├── src
+│   ├── public
+│   ├── package.json
+│   └── vite.config.js
 ```
 
 ---
 
-##  Installation
+# Installation
+
+## Backend
 
 ```bash
-git clone <repo-link>
 cd backend
 npm install
+npm run dev
 ```
 
----
-
-##  Run the Server
+## Frontend
 
 ```bash
+cd frontend
+npm install
 npm run dev
 ```
 
 ---
 
-##  API Endpoints
+# API Modules
 
-### Auth
-
-* POST /api/auth/register
-* POST /api/auth/login
-
-### Department
-
-* POST /api/departments
-* GET /api/departments
-* PUT /api/departments/:id
-* DELETE /api/departments/:id
-
-### Employee
-
-* POST /api/employees
-* GET /api/employees
-* PUT /api/employees/:id
-* DELETE /api/employees/:id
+- Authentication API
+- Employee API
+- Department API
+- Leave API
+- Payroll API
+- Dashboard API
 
 ---
 
-##  Testing
+# Author
 
-All APIs were tested using Postman.
+**Team Lead:** Aman Shrivastava
 
----
+**Project:** Human Resource Management System (HRMS)
 
-##  Current Status
+**Technology:** MERN Stack
 
-* Backend APIs fully functional
-* Authentication implemented
-* Protected routes enabled
-
----
-
-## Future Improvements
-
-* Role-based Access Control (Admin/HR)
-* File Upload (Profile Image)
-* Dashboard APIs
-
----
-
-##  Contribution
-
-Worked on implementing Department and Employee modules, adding validation, and improving APIs with search, filtering, and pagination.
-
----
-
-## Conclusion
-
-This project demonstrates a secure and scalable backend system ready for real-world applications.
+**Internship Project**
