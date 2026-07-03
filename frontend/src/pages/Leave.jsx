@@ -23,6 +23,8 @@ function Leave() {
     }
   };
 
+  // Render the leave requests in a table
+
   return (
     <div className="d-flex">
       <Sidebar />
