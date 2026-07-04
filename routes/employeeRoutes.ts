@@ -9,6 +9,7 @@ import {
   deleteEmployee,
   getDashboardStats,
   getSalarySummary,
+  getProfile,
 } from "../controllers/employeeController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -17,30 +18,19 @@ import { upload } from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-// ================= CREATE EMPLOYEE =================
 router.post(
   "/",
   protect,
   authorizeRoles("admin", "hr"),
   upload.single("profileImage"),
   [
-    body("name")
-      .notEmpty()
-      .withMessage("Name is required"),
-
-    body("email")
-      .isEmail()
-      .withMessage("Valid email is required"),
-
-    body("salary")
-      .optional()
-      .isNumeric()
-      .withMessage("Salary must be a number"),
+    body("name").notEmpty().withMessage("Name is required"),
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("salary").optional().isNumeric().withMessage("Salary must be a number"),
   ],
   createEmployee
 );
 
-// ================= GET ALL EMPLOYEES =================
 router.get(
   "/",
   protect,
@@ -48,7 +38,8 @@ router.get(
   getEmployees
 );
 
-// ================= GET SINGLE EMPLOYEE =================
+router.get("/profile", protect, getProfile);
+
 router.get(
   "/:id",
   protect,
@@ -56,38 +47,21 @@ router.get(
   getEmployeeById
 );
 
-// ================= UPDATE EMPLOYEE =================
 router.put(
   "/:id",
   protect,
   authorizeRoles("admin", "hr"),
   upload.single("profileImage"),
   [
-    body("name")
-      .notEmpty()
-      .withMessage("Name is required"),
-
-    body("email")
-      .isEmail()
-      .withMessage("Valid email is required"),
-
-    body("salary")
-      .optional()
-      .isNumeric()
-      .withMessage("Salary must be a number"),
+    body("name").notEmpty().withMessage("Name is required"),
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("salary").optional().isNumeric().withMessage("Salary must be a number"),
   ],
   updateEmployee
 );
 
-// ================= DELETE EMPLOYEE =================
-router.delete(
-  "/:id",
-  protect,
-  authorizeRoles("admin"),
-  deleteEmployee
-);
+router.delete("/:id", protect, authorizeRoles("admin"), deleteEmployee);
 
-// ================= DASHBOARD STATS =================
 router.get(
   "/dashboard/stats",
   protect,
@@ -95,7 +69,6 @@ router.get(
   getDashboardStats
 );
 
-// ================= SALARY SUMMARY =================
 router.get(
   "/dashboard/salary-summary",
   protect,

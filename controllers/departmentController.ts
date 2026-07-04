@@ -1,10 +1,9 @@
+import { Request, Response, NextFunction } from "express";
 import Department from "../models/Department.js";
 
 // ================= CREATE =================
-export const createDepartment = async (req, res, next) => {
+export const createDepartment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log("Creating Department:", req.body);
-
     if (!req.body.name) {
       return res.status(400).json({
         success: false,
@@ -12,7 +11,6 @@ export const createDepartment = async (req, res, next) => {
       });
     }
 
-    // duplicate check (only once)
     const existing = await Department.findOne({
       name: req.body.name.trim(),
     });
@@ -30,7 +28,7 @@ export const createDepartment = async (req, res, next) => {
       success: true,
       data: dept,
     });
-  } catch (err) {
+  } catch (err: any) {
     if (err.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -42,10 +40,8 @@ export const createDepartment = async (req, res, next) => {
 };
 
 // ================= GET ALL =================
-export const getDepartments = async (req, res, next) => {
+export const getDepartments = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log("Fetching all departments");
-
     const depts = await Department.find();
 
     res.json({
@@ -59,10 +55,8 @@ export const getDepartments = async (req, res, next) => {
 };
 
 // ================= UPDATE =================
-export const updateDepartment = async (req, res, next) => {
+export const updateDepartment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log("Updating Department:", req.params.id);
-
     if (!req.body.name) {
       return res.status(400).json({
         success: false,
@@ -70,7 +64,6 @@ export const updateDepartment = async (req, res, next) => {
       });
     }
 
-    // duplicate check (fix added)
     const existing = await Department.findOne({
       name: req.body.name.trim(),
       _id: { $ne: req.params.id },
@@ -100,7 +93,7 @@ export const updateDepartment = async (req, res, next) => {
       success: true,
       data: dept,
     });
-  } catch (err) {
+  } catch (err: any) {
     if (err.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -112,10 +105,8 @@ export const updateDepartment = async (req, res, next) => {
 };
 
 // ================= DELETE =================
-export const deleteDepartment = async (req, res, next) => {
+export const deleteDepartment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log("Deleting Department:", req.params.id);
-
     const dept = await Department.findByIdAndDelete(req.params.id);
 
     if (!dept) {
@@ -128,6 +119,36 @@ export const deleteDepartment = async (req, res, next) => {
     res.json({
       success: true,
       message: "Department deleted successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ================= GET STATS ($lookup) =================
+export const getDepartmentStats = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const stats = await Department.aggregate([
+      {
+        $lookup: {
+          from: "employees",
+          localField: "_id",
+          foreignField: "department",
+          as: "employeesList",
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          employeeCount: { $size: "$employeesList" },
+        },
+      },
+    ]);
+
+    res.json({
+      success: true,
+      data: stats,
     });
   } catch (err) {
     next(err);

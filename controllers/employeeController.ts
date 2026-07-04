@@ -1,5 +1,7 @@
 import Employee from "../models/Employee.js";
 import Department from "../models/Department.js";
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
 
 // ================= CREATE =================
@@ -21,17 +23,26 @@ export const createEmployee = async (req, res, next) => {
       });
     }
 
-    // Duplicate Email Check
-    const existing = await Employee.findOne({
-      email: req.body.email,
-    });
+    const existingEmp = await Employee.findOne({ email: req.body.email });
+    const existingUser = await User.findOne({ email: req.body.email });
 
-    if (existing) {
+    if (existingEmp || existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Employee already exists with this email",
+        message: "Employee or User already exists with this email",
       });
     }
+
+    const firstName = req.body.name.split(" ")[0].toLowerCase();
+    const defaultPassword = `${firstName}123`;
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    const user = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: hashedPassword,
+      role: "employee"
+    });
 
     const emp = await Employee.create({
       ...req.body,
@@ -41,6 +52,7 @@ export const createEmployee = async (req, res, next) => {
     res.status(201).json({
       success: true,
       data: emp,
+      message: `Employee created. Default password: ${defaultPassword}`
     });
   } catch (err) {
     next(err);
@@ -59,7 +71,6 @@ export const getEmployees = async (req, res, next) => {
 
     let query = {};
 
-    // Search
     if (search) {
       query.name = {
         $regex: search,
@@ -67,7 +78,6 @@ export const getEmployees = async (req, res, next) => {
       };
     }
 
-    // Filter
     if (department) {
       query.department = department;
     }
@@ -118,6 +128,36 @@ export const getEmployeeById = async (req, res, next) => {
   }
 };
 
+export const getProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Admins might not have an Employee record, so we return basic info
+    const emp = await Employee.findOne({ email: user.email }).populate("department");
+    if (!emp) {
+       return res.status(200).json({
+         success: true,
+         data: {
+           name: user.name,
+           email: user.email,
+           designation: user.role === "admin" ? "Administrator" : "HR Manager",
+           _id: user._id
+         }
+       });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: emp,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // ================= UPDATE =================
 export const updateEmployee = async (req, res, next) => {
   try {
@@ -137,7 +177,6 @@ export const updateEmployee = async (req, res, next) => {
       });
     }
 
-    // Duplicate Email Check
     const existing = await Employee.findOne({
       email: req.body.email,
       _id: { $ne: req.params.id },
@@ -150,11 +189,8 @@ export const updateEmployee = async (req, res, next) => {
       });
     }
 
-    const updateData = {
-      ...req.body,
-    };
+    const updateData = { ...req.body };
 
-    // Update Profile Image
     if (req.file) {
       updateData.profileImage = req.file.filename;
     }

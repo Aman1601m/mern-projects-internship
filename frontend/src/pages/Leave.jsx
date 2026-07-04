@@ -1,60 +1,21 @@
-import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import api from "../services/api";
 
 function Leave() {
-  const [leaves, setLeaves] = useState([]);
-
-  useEffect(() => {
-    fetchLeaves();
-  }, []);
-
-  const fetchLeaves = async () => {
-    try {
-      const res = await api.get("/leaves", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      setLeaves(res.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  // Render the leave requests in a table
-
   return (
-    <div className="d-flex">
+    <div className="flex bg-[#f8fafc] min-h-screen">
       <Sidebar />
-
-      <div className="container-fluid p-4">
-        <h2>Leave Requests</h2>
-
-        <table className="table table-striped mt-3">
-          <thead className="table-dark">
-            <tr>
-              <th>Employee</th>
-              <th>Type</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {leaves.map((leave) => (
-              <tr key={leave._id}>
-                <td>{leave.employee?.name}</td>
-                <td>{leave.leaveType}</td>
-                <td>{leave.fromDate?.substring(0,10)}</td>
-                <td>{leave.toDate?.substring(0,10)}</td>
-                <td>{leave.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="flex-1">
+        <div className="h-20 bg-white border-b border-gray-100 flex items-center justify-center px-8 shadow-sm">
+           <h2 className="text-2xl font-bold text-gray-800 m-0">Leave Management</h2>
+        </div>
+        <div className="p-8">
+          <div className="bg-white rounded-xl shadow-sm p-12 border border-gray-100 flex flex-col items-center justify-center text-center h-[60vh]">
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Module Not Implemented</h3>
+            <p className="text-gray-500 max-w-md">
+              The Leave Management module is currently empty. This section is reserved for Member B to implement the complex leave accrual and approval workflows.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

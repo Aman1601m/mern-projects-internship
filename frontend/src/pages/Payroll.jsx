@@ -1,73 +1,24 @@
-import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import api from "../services/api";
 
-function Dashboard() {
-
-  const [stats, setStats] = useState({
-    totalEmployees: 0,
-    totalDepartments: 0,
-    totalSalary: 0,
-  });
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-
-      const res = await api.get("/employees/dashboard/stats", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      setStats(res.data.data);
-
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
+function Payroll() {
   return (
-    <div className="d-flex">
-
+    <div className="flex bg-[#f8fafc] min-h-screen">
       <Sidebar />
-
-      <div className="container-fluid p-4">
-
-        <h2>Dashboard</h2>
-
-        <div className="row mt-4">
-
-          <div className="col-md-4">
-            <div className="card shadow p-3">
-              <h5>Total Employees</h5>
-              <h2>{stats.totalEmployees}</h2>
-            </div>
-          </div>
-
-          <div className="col-md-4">
-            <div className="card shadow p-3">
-              <h5>Total Departments</h5>
-              <h2>{stats.totalDepartments}</h2>
-            </div>
-          </div>
-
-          <div className="col-md-4">
-            <div className="card shadow p-3">
-              <h5>Total Salary</h5>
-              <h2>₹{stats.totalSalary}</h2>
-            </div>
-          </div>
-
+      <div className="flex-1">
+        <div className="h-20 bg-white border-b border-gray-100 flex items-center justify-center px-8 shadow-sm">
+           <h2 className="text-2xl font-bold text-gray-800 m-0">Payroll & Reporting</h2>
         </div>
-
+        <div className="p-8">
+          <div className="bg-white rounded-xl shadow-sm p-12 border border-gray-100 flex flex-col items-center justify-center text-center h-[60vh]">
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Module Not Implemented</h3>
+            <p className="text-gray-500 max-w-md">
+              The Payroll Automation module is currently empty. This section is reserved for Member C to implement the PDF payslip generation and automated salary deductions.
+            </p>
+          </div>
+        </div>
       </div>
-
     </div>
   );
 }
 
-export default Dashboard;
+export default Payroll;
