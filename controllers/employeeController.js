@@ -257,3 +257,84 @@ export const deleteEmployee = async (req, res) => {
     });
   }
 };
+
+/**
+ * @desc Employee Aggregation
+ * @route GET /api/employees/aggregation
+ */
+export const getEmployeeAggregation = async (req, res) => {
+  try {
+    const employees = await Employee.aggregate([
+      {
+        $lookup: {
+          from: "departments",
+          localField: "department",
+          foreignField: "_id",
+          as: "department",
+        },
+      },
+      {
+        $unwind: {
+          path: "$department",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "employees",
+          localField: "manager",
+          foreignField: "_id",
+          as: "manager",
+        },
+      },
+      {
+        $unwind: {
+          path: "$manager",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          employeeId: 1,
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          designation: 1,
+          salary: 1,
+          status: 1,
+
+          department: {
+            _id: "$department._id",
+            name: "$department.name",
+            code: "$department.code",
+          },
+
+          manager: {
+            _id: "$manager._id",
+            firstName: "$manager.firstName",
+            lastName: "$manager.lastName",
+            email: "$manager.email",
+          },
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      count: employees.length,
+      data: employees,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
