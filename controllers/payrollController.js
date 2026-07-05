@@ -1,5 +1,6 @@
 import Payroll from "../models/Payroll.js";
 import Employee from "../models/Employee.js";
+import generatePayslip from "../utils/generatePayslip.js";
 
 /**
  * @desc Create Payroll
@@ -239,4 +240,26 @@ export const deletePayroll = async (req, res) => {
 
   }
 
+};
+
+export const downloadPayslip = async (req, res) => {
+  try {
+    const payroll = await Payroll.findById(req.params.id).populate(
+      "employee"
+    );
+
+    if (!payroll) {
+      return res.status(404).json({
+        success: false,
+        message: "Payroll record not found.",
+      });
+    }
+
+    generatePayslip(res, payroll);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
