@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js";
+import payrollRoutes from "./routes/payrollRoutes.js";
 
 dotenv.config();
 
@@ -27,6 +28,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/leaves", leaveRoutes);
+app.use("/api/payrolls", payrollRoutes);
+
 // Base Route
 app.get("/", (req, res) => {
   res.send("Enterprise HRMS Backend API Running...");
