@@ -144,6 +144,22 @@ npm run dev
 
 ---
 
+# 🔑 Login & Testing Credentials
+
+UAT/Testing ke liye niche diye gaye accounts ka use kiya ja sakta hai:
+
+### 1. Admin Account 👮‍♂️
+- **Email/ID:** `admin@gmail.com`
+- **Password:** `admin123`
+*(Poore system ke access ke liye, employees onboard karne aur department aur payroll setup karne ke liye iska use karein)*
+
+### 2. Employee Account 🧑‍💻
+- **Email/ID:** Jo email onboard karte waqt add kiya ho (e.g. `employee@gmail.com`)
+- **Password:** Employee ke First Name ko lowercase mein likh kar aage `123` lagayein.
+  - *Example:* Agar employee ka naam **Shikhar Sharma** hai, toh password **`shikhar123`** hoga.
+
+---
+
 # Author
 
 **Team Lead:** Aman Shrivastava
