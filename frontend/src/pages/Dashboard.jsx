@@ -52,7 +52,7 @@ function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await api.get("/employees/dashboard/stats", {
+      const res = await api.get("/dashboard/stats", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setStats(res.data.data);
