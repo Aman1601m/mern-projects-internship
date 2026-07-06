@@ -7,20 +7,20 @@ dotenv.config();
 
 mongoose.connect(process.env.MONGO_URI as string).then(async () => {
   try {
-    const hashedPassword = await bcrypt.hash("admin123", 10);
-    const existing = await User.findOne({ email: "admin@hrms.com" });
+    const email = "admin@hrms.com";
+    const password = "admin123";
+    const hashedPassword = await bcrypt.hash(password, 10);
     
-    if (existing) {
-       console.log("Admin account already exists!");
-    } else {
-       await User.create({
-         name: "System Admin",
-         email: "admin@hrms.com",
-         password: hashedPassword,
-         role: "admin"
-       });
-       console.log("Admin account created successfully!");
-    }
+    // Delete existing admin to clear any wrong hashes
+    await User.deleteOne({ email });
+    
+    await User.create({
+      name: "System Admin",
+      email,
+      password: hashedPassword,
+      role: "admin"
+    });
+    console.log("Admin account successfully reset to admin@hrms.com / admin123!");
   } catch (error) {
     console.error("Error seeding admin:", error);
   } finally {
