@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 dotenv.config();
 
-mongoose.connect(process.env.MONGO_URI as string).then(async () => {
+mongoose.connect(process.env.MONGO_URI).then(async () => {
   try {
     const email = "admin@hrms.com";
     const password = "admin123";
