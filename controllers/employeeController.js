@@ -1,5 +1,7 @@
 import Employee from "../models/Employee.js";
 import Department from "../models/Department.js";
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 
 /**
  * @desc Create Employee
@@ -332,6 +334,55 @@ export const getEmployeeAggregation = async (req, res) => {
   } catch (error) {
     console.error(error);
 
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * @desc Reset Employee Password
+ * @route PUT /api/employees/:id/reset-password
+ * @access HR Manager / Admin
+ */
+export const resetEmployeePassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    const emp = await Employee.findById(id);
+    if (!emp) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    const user = await User.findOne({ email: emp.email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User account not found for this employee",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Password reset successfully for ${emp.firstName} ${emp.lastName}`,
+    });
+  } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,

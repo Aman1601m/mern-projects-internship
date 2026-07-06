@@ -299,3 +299,45 @@ export const getSalarySummary = async (req, res, next) => {
     next(err);
   }
 };
+
+// ================= RESET PASSWORD =================
+export const resetEmployeePassword = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    const emp = await Employee.findById(id);
+    if (!emp) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    const user = await User.findOne({ email: emp.email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User account not found for this employee",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Password reset successfully for ${emp.name}`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

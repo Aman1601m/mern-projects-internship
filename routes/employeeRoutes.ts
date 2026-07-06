@@ -10,6 +10,7 @@ import {
   getDashboardStats,
   getSalarySummary,
   getProfile,
+  resetEmployeePassword,
 } from "../controllers/employeeController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -74,6 +75,13 @@ router.get(
   protect,
   authorizeRoles("admin", "hr"),
   getSalarySummary
+);
+
+router.put(
+  "/:id/reset-password",
+  protect,
+  authorizeRoles("admin", "hr"),
+  resetEmployeePassword
 );
 
 export default router;

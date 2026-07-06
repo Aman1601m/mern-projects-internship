@@ -35,6 +35,22 @@ function Employees() {
     }
   };
 
+  const handleResetPassword = async (id, name) => {
+    const newPassword = window.prompt(`Enter new password for ${name}:`);
+    if (newPassword === null) return; // User cancelled
+    if (newPassword.trim().length < 6) {
+      alert("Password must be at least 6 characters long!");
+      return;
+    }
+
+    try {
+      const res = await api.put(`/employees/${id}/reset-password`, { password: newPassword });
+      alert(res.data.message || "Password reset successfully!");
+    } catch (err) {
+      alert("Failed to reset password: " + (err.response?.data?.message || err.message));
+    }
+  };
+
   const employees = response?.data || [];
 
   return (
@@ -78,15 +94,16 @@ function Employees() {
                 <th className="p-4 font-semibold">Role & Dept</th>
                 <th className="p-4 font-semibold">Join Date</th>
                 <th className="p-4 font-semibold">Offered Salary</th>
+                <th className="p-4 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan="5" className="p-4 text-center text-gray-500">Loading employees...</td></tr>
+                <tr><td colSpan="6" className="p-4 text-center text-gray-500">Loading employees...</td></tr>
               ) : isError ? (
-                <tr><td colSpan="5" className="p-4 text-center text-red-500">Failed to load employees</td></tr>
+                <tr><td colSpan="6" className="p-4 text-center text-red-500">Failed to load employees</td></tr>
               ) : employees.length === 0 ? (
-                <tr><td colSpan="5" className="p-4 text-center text-gray-500">No employees found.</td></tr>
+                <tr><td colSpan="6" className="p-4 text-center text-gray-500">No employees found.</td></tr>
               ) : (
                 employees.map((emp) => (
                   <tr key={emp._id} className="border-b hover:bg-gray-50 transition-colors">
@@ -104,6 +121,14 @@ function Employees() {
                     </td>
                     <td className="p-4 text-gray-500 text-sm">{emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : "N/A"}</td>
                     <td className="p-4 font-extrabold text-green-700">₹{emp.salary}</td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => handleResetPassword(emp._id, emp.name)}
+                        className="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                      >
+                        Reset Password
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
