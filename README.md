@@ -148,8 +148,8 @@ npm run dev
 
 UAT/Testing ke liye niche diye gaye accounts ka use kiya ja sakta hai:
 
-### 1. Admin Account 
-- **Email/ID:** `admin@hrms.com`
+### 1. Admin Account 👮‍♂️
+- **Email/ID:** `admin@gmail.com`
 - **Password:** `admin123`
 *(Poore system ke access ke liye, employees onboard karne aur department aur payroll setup karne ke liye iska use karein)*
 

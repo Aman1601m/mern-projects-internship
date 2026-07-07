@@ -8,6 +8,7 @@ import {
   deleteEmployee,
   getEmployeeAggregation,
   resetEmployeePassword,
+  getProfile,
 } from "../controllers/employeeController.js";
 
 const router = express.Router();
@@ -16,6 +17,7 @@ const router = express.Router();
 router.post("/", createEmployee);
 router.get("/", getEmployees);
 router.get("/aggregation", getEmployeeAggregation);
+router.get("/profile", getProfile);
 router.get("/:id", getEmployeeById);
 router.put("/:id", updateEmployee);
 router.delete("/:id", deleteEmployee);
