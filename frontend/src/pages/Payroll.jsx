@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import Sidebar from "../components/Sidebar";
-import { useGetPayrollsQuery, useCreatePayrollMutation, useGetEmployeesQuery } from "../store/apiSlice";
+import { useGetPayrollsQuery, useCreatePayrollMutation, useGetEmployeesQuery, useGetProfileQuery } from "../store/apiSlice";
 import { FileText, Plus, X, Download } from "lucide-react";
 
 function Payroll() {
@@ -20,13 +19,27 @@ function Payroll() {
     deductions: "",
     paymentStatus: "Pending",
   });
-
-  const { user } = useSelector((state) => state.auth);
+  
+  const { data: profileRes } = useGetProfileQuery();
+  const user = profileRes?.data;
+  
+  // Fallback to token if profile takes time to load
+  let role = user?.role;
+  let userEmail = user?.email;
+  if (!role) {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        role = payload.role;
+      } catch (e) { /* ignore */ }
+    }
+  }
 
   const allPayrolls = payrollRes?.data || [];
-  const payrolls = user?.role === "admin" 
+  const payrolls = role === "admin" 
     ? allPayrolls 
-    : allPayrolls.filter(p => p.employee?.email === user?.email);
+    : allPayrolls.filter(p => p.employee?.email === userEmail);
     
   const employees = employeesRes?.data || [];
 
@@ -57,7 +70,7 @@ function Payroll() {
             <h2 className="text-2xl font-bold text-gray-800 m-0">Payroll & Payslips</h2>
             <p className="text-sm text-gray-500 mt-1">Manage employee salaries and download payslip PDFs</p>
           </div>
-          {user?.role === "admin" && (
+          {role === "admin" && (
             <button
               onClick={() => setIsModalOpen(true)}
               className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm"
@@ -152,7 +165,7 @@ function Payroll() {
                   >
                     <option value="">-- Choose Employee --</option>
                     {employees.map(emp => (
-                      <option key={emp._id} value={emp._id}>{emp.firstName} {emp.lastName} ({emp.employeeId})</option>
+                      <option key={emp._id} value={emp._id}>{emp.name || `${emp.firstName} ${emp.lastName}`} ({emp.employeeId || `EMP-${emp._id.substring(18).toUpperCase()}`})</option>
                     ))}
                   </select>
                 </div>
