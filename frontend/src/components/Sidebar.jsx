@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../store/slices/authSlice";
 import { useGetProfileQuery } from "../store/apiSlice";
+import NotificationBell from "./NotificationBell";
 import { 
   LayoutDashboard, 
   Users, 
@@ -54,7 +55,12 @@ function Sidebar() {
     <div className="bg-white border-r border-gray-100 flex flex-col transition-all duration-300 shadow-sm" style={{ width: "260px", minHeight: "100vh" }}>
       {/* Brand Logo & Profile */}
       <div className="p-6 border-b border-gray-50">
-        <h3 className="text-2xl font-bold text-blue-600 tracking-tight m-0 mb-6">HRMS</h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-blue-600 tracking-tight m-0">HRMS</h3>
+          {!isAdmin && (
+            <NotificationBell userId={userId} token={token} />
+          )}
+        </div>
         
         {profile && (
           <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">

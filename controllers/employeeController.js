@@ -2,6 +2,7 @@ import Employee from "../models/Employee.js";
 import Department from "../models/Department.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 /**
  * @desc Create Employee
@@ -386,6 +387,51 @@ export const resetEmployeePassword = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+/**
+ * @desc Get Logged-in User/Employee Profile
+ * @route GET /api/employees/profile
+ * @access Private
+ */
+export const getProfile = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ success: false, message: "No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const emp = await Employee.findOne({ email: user.email }).populate("department");
+    if (!emp) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          name: user.name,
+          email: user.email,
+          designation: user.role === "admin" ? "Administrator" : "HR Manager",
+          _id: user._id
+        }
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: emp,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Invalid or expired token",
     });
   }
 };
