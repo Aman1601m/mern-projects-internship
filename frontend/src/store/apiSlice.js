@@ -33,12 +33,12 @@ export const apiSlice = createApi({
       providesTags: ['Employee'],
     }),
     getPayrolls: builder.query({
-      query: () => '/payroll',
+      query: () => '/payrolls',
       providesTags: ['Payroll'],
     }),
     createPayroll: builder.mutation({
       query: (payrollData) => ({
-        url: '/payroll',
+        url: '/payrolls',
         method: 'POST',
         body: payrollData,
       }),
