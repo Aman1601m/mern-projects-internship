@@ -30,7 +30,8 @@ function Departments() {
     e.preventDefault();
     if (!name) return;
     try {
-      await api.post("/departments", { name }, {
+      const generatedCode = name.substring(0, 3).toUpperCase();
+      await api.post("/departments", { name, code: generatedCode }, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       setName("");
