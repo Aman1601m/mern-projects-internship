@@ -30,7 +30,8 @@ function Departments() {
     e.preventDefault();
     if (!name) return;
     try {
-      await api.post("/departments", { name }, {
+      const generatedCode = name.substring(0, 3).toUpperCase();
+      await api.post("/departments", { name, code: generatedCode }, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       setName("");
@@ -100,7 +101,7 @@ function Departments() {
                     ) : (
                       getEmployeesForDepartment(selectedDepartment._id).map((emp) => (
                         <tr key={emp._id} className="border-b hover:bg-gray-50 transition-colors">
-                          <td className="p-4 font-bold text-gray-800">{emp.name}</td>
+                          <td className="p-4 font-bold text-gray-800">{emp.name || `${emp.firstName} ${emp.lastName}`}</td>
                           <td className="p-4 text-gray-600">{emp.email}</td>
                           <td className="p-4 text-gray-500">{emp.designation || "N/A"}</td>
                         </tr>
