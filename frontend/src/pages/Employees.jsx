@@ -9,6 +9,12 @@ function Employees() {
 
   const [form, setForm] = useState({ name: "", email: "", mobileNumber: "", designation: "", department: "", salary: "", joiningDate: "" });
   const [departments, setDepartments] = useState([]);
+  const [notification, setNotification] = useState({ show: false, message: "", type: "" });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => setNotification({ show: false, message: "", type: "" }), 4000);
+  };
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -27,11 +33,20 @@ function Employees() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await addEmployee(form).unwrap();
+      const nameParts = form.name.trim().split(" ");
+      const payload = {
+        ...form,
+        firstName: nameParts[0] || "Employee",
+        lastName: nameParts.slice(1).join(" ") || "Name",
+        phone: form.mobileNumber,
+        employeeId: `EMP${Math.floor(1000 + Math.random() * 9000)}`, // random 4 digit ID
+      };
+      
+      const res = await addEmployee(payload).unwrap();
       setForm({ name: "", email: "", mobileNumber: "", designation: "", department: "", salary: "", joiningDate: "" });
-      alert(res.message || "Employee added successfully!");
+      showNotification(res.message || "Employee onboarded successfully!", "success");
     } catch (err) {
-      alert("Failed to add employee: " + (err.data?.message || err.error));
+      showNotification("Failed to add employee: " + (err.data?.message || err.error), "error");
     }
   };
 
@@ -45,9 +60,9 @@ function Employees() {
 
     try {
       const res = await api.put(`/employees/${id}/reset-password`, { password: newPassword });
-      alert(res.data.message || "Password reset successfully!");
+      showNotification(res.data.message || "Password reset successfully!", "success");
     } catch (err) {
-      alert("Failed to reset password: " + (err.response?.data?.message || err.message));
+      showNotification("Failed to reset password: " + (err.response?.data?.message || err.message), "error");
     }
   };
 
@@ -64,6 +79,15 @@ function Employees() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100 border-t-4 border-t-blue-500">
           <h3 className="text-xl font-semibold mb-4 text-gray-700">1-Click Employee Onboarding</h3>
           <p className="text-sm text-gray-500 mb-4">Adding an employee here automatically creates their HR Profile and generates their User Login Account.</p>
+          
+          {notification.show && (
+            <div className={`p-4 mb-6 rounded-lg font-medium shadow-sm transition-all flex items-center justify-between ${
+              notification.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"
+            }`}>
+              {notification.message}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input type="text" name="name" placeholder="Full Name" value={form.name} onChange={handleChange} required className="border p-2 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <input type="email" name="email" placeholder="Email Address" value={form.email} onChange={handleChange} required className="border p-2 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
