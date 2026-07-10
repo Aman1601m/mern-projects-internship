@@ -44,12 +44,20 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Payroll'],
     }),
+    deleteEmployee: builder.mutation({
+      query: (id) => ({
+        url: `/employees/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Employee'],
+    }),
   }),
 });
 
 export const {
   useGetEmployeesQuery,
   useAddEmployeeMutation,
+  useDeleteEmployeeMutation,
   useGetProfileQuery,
   useGetPayrollsQuery,
   useCreatePayrollMutation,
