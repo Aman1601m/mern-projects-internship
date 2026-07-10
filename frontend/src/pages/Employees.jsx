@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import { useGetEmployeesQuery, useAddEmployeeMutation } from "../store/apiSlice";
+import { Trash2 } from "lucide-react";
+import { useGetEmployeesQuery, useAddEmployeeMutation, useDeleteEmployeeMutation } from "../store/apiSlice";
 import api from "../services/api";
 
 function Employees() {
   const { data: response, isLoading, isError } = useGetEmployeesQuery();
   const [addEmployee, { isLoading: isAdding }] = useAddEmployeeMutation();
+  const [deleteEmployee] = useDeleteEmployeeMutation();
 
   const [form, setForm] = useState({ name: "", email: "", mobileNumber: "", designation: "", department: "", salary: "", joiningDate: "" });
   const [departments, setDepartments] = useState([]);
@@ -63,6 +65,16 @@ function Employees() {
       showNotification(res.data.message || "Password reset successfully!", "success");
     } catch (err) {
       showNotification("Failed to reset password: " + (err.response?.data?.message || err.message), "error");
+    }
+  };
+
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to completely delete ${name} from the system? This cannot be undone.`)) return;
+    try {
+      await deleteEmployee(id).unwrap();
+      showNotification(`${name} was successfully removed from the system.`, "success");
+    } catch (err) {
+      showNotification("Failed to delete employee: " + (err.data?.message || err.error), "error");
     }
   };
 
@@ -145,13 +157,22 @@ function Employees() {
                     </td>
                     <td className="p-4 text-gray-500 text-sm">{emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : "N/A"}</td>
                     <td className="p-4 font-extrabold text-green-700">₹{emp.salary}</td>
-                    <td className="p-4">
-                      <button
-                        onClick={() => handleResetPassword(emp._id, emp.name)}
-                        className="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm"
-                      >
-                        Reset Password
-                      </button>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => handleResetPassword(emp._id, emp.name || emp.firstName)}
+                          className="bg-gray-100 text-gray-700 font-medium py-1 px-3 rounded text-sm hover:bg-gray-200 transition-colors"
+                        >
+                          Reset Pass
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(emp._id, emp.name || emp.firstName)}
+                          title="Delete Employee"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
