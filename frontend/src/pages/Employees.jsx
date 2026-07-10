@@ -132,12 +132,12 @@ function Employees() {
                 employees.map((emp) => (
                   <tr key={emp._id} className="border-b hover:bg-gray-50 transition-colors">
                     <td className="p-4">
-                      <div className="font-bold text-gray-800">{emp.name}</div>
-                      <div className="text-xs text-gray-400 font-mono">EMP-{emp._id.substring(18).toUpperCase()}</div>
+                      <div className="font-bold text-gray-800">{emp.name || `${emp.firstName} ${emp.lastName}`}</div>
+                      <div className="text-xs text-gray-400 font-mono">{emp.employeeId || `EMP-${emp._id.substring(18).toUpperCase()}`}</div>
                     </td>
                     <td className="p-4 text-gray-600 text-sm">
                        <div>{emp.email}</div>
-                       <div className="text-gray-400">{emp.mobileNumber || "N/A"}</div>
+                       <div className="text-gray-400">{emp.mobileNumber || emp.phone || "N/A"}</div>
                     </td>
                     <td className="p-4 text-gray-600">
                       <div className="font-medium text-gray-800">{emp.designation || 'Employee'}</div>
