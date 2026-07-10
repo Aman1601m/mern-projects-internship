@@ -1,5 +1,7 @@
 import Leave from "../models/Leave.js";
 import Employee from "../models/Employee.js";
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 
 /**
  * @desc Apply Leave
@@ -9,7 +11,6 @@ import Employee from "../models/Employee.js";
 export const applyLeave = async (req, res) => {
   try {
     const {
-      employee,
       leaveType,
       startDate,
       endDate,
@@ -18,23 +19,38 @@ export const applyLeave = async (req, res) => {
     } = req.body;
 
     // Validation
-    if (
-      !employee ||
-      !leaveType ||
-      !startDate ||
-      !endDate ||
-      !totalDays ||
-      !reason
-    ) {
+    if (!leaveType || !startDate || !endDate || !totalDays || !reason) {
       return res.status(400).json({
         success: false,
         message: "Please fill all required fields.",
       });
     }
 
-    // Check employee exists
-    const employeeExists = await Employee.findById(employee);
+    // Auto-detect employee from JWT token
+    let employeeId = req.body.employee;
 
+    if (!employeeId) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
+        const user = await User.findById(decoded.id);
+        if (user) {
+          const emp = await Employee.findOne({ email: user.email });
+          if (emp) employeeId = emp._id;
+        }
+      }
+    }
+
+    if (!employeeId) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee record not found for this user.",
+      });
+    }
+
+    // Verify employee exists
+    const employeeExists = await Employee.findById(employeeId);
     if (!employeeExists) {
       return res.status(404).json({
         success: false,
@@ -43,7 +59,7 @@ export const applyLeave = async (req, res) => {
     }
 
     const leave = await Leave.create({
-      employee,
+      employee: employeeId,
       leaveType,
       startDate,
       endDate,
@@ -58,8 +74,6 @@ export const applyLeave = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,

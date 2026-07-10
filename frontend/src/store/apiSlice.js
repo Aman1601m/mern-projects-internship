@@ -32,11 +32,33 @@ export const apiSlice = createApi({
       query: () => '/employees/profile',
       providesTags: ['Employee'],
     }),
+    getPayrolls: builder.query({
+      query: () => '/payrolls',
+      providesTags: ['Payroll'],
+    }),
+    createPayroll: builder.mutation({
+      query: (payrollData) => ({
+        url: '/payrolls',
+        method: 'POST',
+        body: payrollData,
+      }),
+      invalidatesTags: ['Payroll'],
+    }),
+    deleteEmployee: builder.mutation({
+      query: (id) => ({
+        url: `/employees/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Employee'],
+    }),
   }),
 });
 
 export const {
   useGetEmployeesQuery,
   useAddEmployeeMutation,
+  useDeleteEmployeeMutation,
   useGetProfileQuery,
+  useGetPayrollsQuery,
+  useCreatePayrollMutation,
 } = apiSlice;
